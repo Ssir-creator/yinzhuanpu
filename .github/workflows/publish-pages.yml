@@ -4,33 +4,23 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 concurrency:
   group: publish-website
   cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Build standalone website
         run: python3 scripts/build_standalone.py
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Prepare public files
-        run: |
-          mkdir -p _site
-          cp index.html _site/index.html
-          touch _site/.nojekyll
-      - name: Upload public website
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-      - name: Deploy GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Update public branch
+        run: python3 scripts/publish_pages.py
+      # GITHUB_TOKEN pushes do not trigger another workflow automatically.
+      # Explicitly request the legacy Pages build for the configured gh-pages source.
+      - name: Request GitHub Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" --jq '{status,url}'

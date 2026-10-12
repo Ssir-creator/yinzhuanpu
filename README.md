@@ -2,13 +2,11 @@
 
 ## 网站发布
 
-发布目标为 GitHub Pages。自动发布方式：仓库 Settings → Pages → Source 选择 `GitHub Actions`，然后在 Actions → Publish website → Run workflow 运行一次。
+网站地址：https://ssir-creator.github.io/yinzhuanpu/ 。Pages 使用 `gh-pages` 分支的根目录，只部署自包含的 `index.html` 与 `.nojekyll`，不部署录音或开发目录。
 
-`.github/workflows/publish-pages.yml` 会在 `main` 更新时重建并通过官方 Pages Actions 发布页面，需要允许工作流执行及 `pages: write` / `id-token: write` 权限。只部署自包含的 index.html，不部署录音或开发目录。
+`.github/workflows/publish-pages.yml` 在 `main` 更新时重建页面、更新 `gh-pages`，并显式请求 Pages 构建（GitHub 自带令牌推送不会自动触发下一工作流）。需要 `contents: write` 与 `pages: write`。无需更改现有 github-pages 环境的分支保护。
 
-备用方式：选择 `Deploy from a branch` → `gh-pages` → `/(root)`。在已验证修改后运行 `python scripts/build_standalone.py` 和 `python scripts/publish_pages.py` 手动更新此分支。该脚本不会强制推送或切换当前分支；此备用方式需要每次显式更新 gh-pages。
-
-预计网址为 https://ssir-creator.github.io/yinzhuanpu/；是否上线以 Pages 构建结果和网页响应为准。
+备用手动发布：验证修改后运行 `python scripts/build_standalone.py` 和 `python scripts/publish_pages.py`。本地通过 Git 代理直接更新 gh-pages 会触发 Pages 构建。脚本不会强制推送或切换当前分支。
 
 面向**持续、同音轮指**的离线观察原型：选择片段 → 查看起音间隔和相对攻击音变化 → 点击疑似位置试听 → 降速练习并重录。无 AI 模型、不评分、不识别具体手指。
 
