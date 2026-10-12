@@ -11,7 +11,12 @@ EXPECTED = [60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60]
 
 with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
-    page = browser.new_page(viewport={'width': 390, 'height': 844}, accept_downloads=True)
+    context = browser.new_context(
+        viewport={'width': 390, 'height': 844},
+        accept_downloads=True,
+        ignore_https_errors=URL.startswith('https://'),
+    )
+    page = context.new_page()
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(URL)

@@ -22,4 +22,4 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.s
   const offer=()=>{waitingWorker=reg.waiting;if(waitingWorker)$('#app-update').hidden=false};
   offer();reg.onupdatefound=()=>{const worker=reg.installing;if(worker)worker.onstatechange=()=>worker.state==='installed'&&navigator.serviceWorker.controller&&offer()};
   navigator.serviceWorker.oncontrollerchange=()=>location.reload();
-});
+}).catch(()=>{});
