@@ -1,8 +1,8 @@
-# 弦镜 · 轮指均匀度观察室 v0.4
+# 弦镜 · 轮指均匀度观察室 v0.5
 
 ## 网站发布
 
-网站地址：https://ssir-creator.github.io/yinzhuanpu/ 。Pages 使用 `gh-pages` 分支的根目录，只部署自包含的 `index.html` 与 `.nojekyll`，不部署录音或开发目录。
+网站地址：https://ssir-creator.github.io/yinzhuanpu/ 。Pages 使用 `gh-pages` 分支的根目录，部署自包含的 `index.html`、PWA manifest、service worker 和图标，不部署用户录音或开发目录。
 
 `.github/workflows/publish-pages.yml` 在 `main` 更新时重建页面、更新 `gh-pages`，并显式请求 Pages 构建（GitHub 自带令牌推送不会自动触发下一工作流）。需要 `contents: write` 与 `pages: write`。无需更改现有 github-pages 环境的分支保护。
 
@@ -33,7 +33,7 @@
 
 ## 开发
 
-修改 `page.template.html`、`style.css`、`app.js`、`practice.js` 后运行：
+修改 `page.template.html`、`style.css`、`app.js`、`practice.js`、`app-shell.js` 后运行：
 
 ```bash
 python scripts/build_standalone.py
@@ -44,7 +44,7 @@ python -m http.server 8000 --bind 0.0.0.0
 
 启动服务后运行 `python tests/smoke.py`（需已有 Playwright / Chromium）；换端口时用 `DEMO_URL=http://127.0.0.1:8001 python tests/smoke.py`。云端 Chromium 管理策略阻止 file:// 导航，因此离线测试在禁网页面载入同一份 HTML 内容，不改动浏览器策略。
 
-## 直接录音与练习记录（v0.4）
+## 直接录音与练习记录（v0.5）
 
 - 点击“开始录音”才请求麦克风。可选择参考 / 练习侧，5 / 10 / 20 秒自动结束，也可提前完成。要求 HTTPS 或 localhost，以及支持 getUserMedia / MediaRecorder 的浏览器。拒绝授权时可继续导入音频。
 - 录制前停止已有播放；录制期间锁定导入和分析操作。完成或离开页面时释放麦克风，不边录边播放自己的输入。请求关闭回声消除、自动增益与降噪，但设备可能不支持这些选项，仍需检查录音条件。
@@ -52,3 +52,15 @@ python -m http.server 8000 --bind 0.0.0.0
 - “保存练习侧”主动保存录音、选区、300 字以内笔记与摘要到当前浏览器 IndexedDB，最多 10 条。不保存合成演示、不自动删除旧记录。可分别恢复到参考 / 练习侧，下载 WAV 备份或删除记录。
 - 本地记录不跨设备同步，清除浏览器数据会丢失。私密模式和单文件页面可能限制存储，请使用网站或下载 WAV。
 - `python tests/practice.py` 验证模拟麦克风、手动 / 自动停止、资源释放、授权拒绝、复制上一遍、本地保存 / 刷新恢复 / 删除、WAV 备份及布局；这是模拟设备验证，不代表已测试真实手机或麦克风。可通过 DEMO_URL 指定测试端口。
+
+## 手机 App（PWA）
+
+界面分为“练习 / 对比 / 记录”，底部切换；不再使用宣传首页。录音完成后自动进入对比页。旧 IndexedDB 库名称保持不变，已有本地记录继续可用。
+
+Android 使用 Chrome 打开网址，选择“安装 App”或浏览器菜单“添加到主屏幕”；iPhone 使用 Safari → 分享 → 添加到主屏幕。支持独立窗口及安全区域布局，PWA 不是应用商店的原生 APK / IPA。安装选项由浏览器提供，站内按钮在无法直接安装时给出对应指引。
+
+首次联网加载并完成缓存后可离线打开、分析内嵌示例和本地音频；录音仍取决于浏览器麦克风支持与权限。应用不会默认实时监测麦克风。浏览器和独立 PWA 的本地记录在部分系统上可能彼此隔离，重要记录请下载 WAV。
+
+`manifest.webmanifest` 与 `icons/` 提供安装资源。修改 `sw.template.js` 来调整缓存策略；构建脚本根据 HTML 内容生成带版本哈希的 `sw.js`。新 worker 等待用户点击更新，录音 / 分析时不能更新；更新前应保存未存储的练习。网络导航优先联网，断网回退到已缓存的入口页。
+
+运行 `python tests/pwa.py` 检查页面导航、安装指引、manifest、图标缓存、待更新、录音时拒绝更新、主动激活及断网后重新加载 / 分析。测试使用独立临时服务，不改动项目的 service worker。实体手机安装及原生应用商店发布尚未验证 / 执行。

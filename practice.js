@@ -59,7 +59,7 @@ $('#record').addEventListener('click', async () => {
         const decoded = await audioContext().decodeAudioData(raw);
         const track = await prepare(waveBytes(decoded), `轮指录音-${new Date().toISOString().replace(/[:.]/g,'-')}.wav`, false);
         tracks[side] = track; $('#comparable').checked = false;
-        render(side); renderRollReview(); $('#record-status').textContent = `已录入${labels[side]}，${track.buffer.duration.toFixed(1)} 秒。请检查选区及起音，再试听。`;
+        render(side); renderRollReview(); window.showScreen?.('compare'); $('#record-status').textContent = `已录入${labels[side]}，${track.buffer.duration.toFixed(1)} 秒。请检查选区及起音，再试听。`;
       } catch { $('#record-status').textContent = '录音太短或无法解码，本次未替换原音频。请重新录制或导入 WAV。'; }
       finally { recordingUI(false); }
     };

@@ -10,7 +10,7 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     page = browser.new_page(viewport={'width':1440,'height':1100}, accept_downloads=True)
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(os.environ.get('DEMO_URL', 'http://127.0.0.1:8000'))
+    page.goto(os.environ.get('DEMO_URL', 'http://127.0.0.1:8000')+'#compare')
     page.wait_for_function('!busy && tracks.practice !== null')
     assert page.locator('[data-technique]').count() == 1
     assert page.evaluate('getComputedStyle(document.querySelector(".comparison-grid")).display') == 'grid'
@@ -107,7 +107,7 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     doc.on('pageerror',lambda e:errors.append(str(e)))
     doc.set_content((ROOT/'demo.html').read_text())
     doc.wait_for_function('!busy && reviewTrack(tracks.practice).events.length>0')
-    assert doc.evaluate('getComputedStyle(document.body).backgroundColor')=='rgb(247, 247, 242)'
+    assert doc.evaluate('getComputedStyle(document.body).backgroundColor')=='rgb(241, 237, 229)'
     assert not errors, errors
     print('PASS: known-onset timing, fixed-gain invariance, irregular interval detection, silence guard, demo review, ROI filtering/validation, localized clip completion, provenance/comparability gates, invalid import, JSON review export, responsive layout and offline bundle.')
     print('Known fixture timing error <25 ms; 18/18 onsets. Demo CV:',review['a']['intervalCV'],review['b']['intervalCV'])
