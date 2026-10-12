@@ -29,7 +29,12 @@ def publish():
         env['GIT_AUTHOR_NAME'] = env['GIT_COMMITTER_NAME'] = 'github-actions[bot]'
         env['GIT_AUTHOR_EMAIL'] = env['GIT_COMMITTER_EMAIL'] = '41898282+github-actions[bot]@users.noreply.github.com'
         git('read-tree', '--empty', env=env)
-        files = [('index.html', page), ('.nojekyll', b'')]
+        files = [
+            ('index.html', page),
+            ('page.template.html', (ROOT / 'page.template.html').read_bytes()),
+            ('demo.html', (ROOT / 'demo.html').read_bytes()),
+            ('.nojekyll', b''),
+        ]
         for name in ['manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'icons/icon-512.png']:
             files.append((name, (ROOT / name).read_bytes()))
         for name, contents in files:
