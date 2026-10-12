@@ -22,7 +22,7 @@
 
 ## 本地运行
 
-项目没有 npm 或 pip 运行时依赖。构建自包含页面并启动服务：
+项目没有 npm 或 pip 运行时依赖。页面结构源文件位于 `src/page.template.html`；构建会生成可独立预览的 `index.html`、`demo.html` 和 `page.template.html`。构建并启动服务：
 
 ```bash
 python scripts/build_standalone.py

@@ -11,7 +11,7 @@ def build():
     if not demo.exists():
         raise RuntimeError('Generate demo-melody.wav first: python scripts/generate_audio.py')
     audio = base64.b64encode(demo.read_bytes()).decode('ascii')
-    html = (ROOT / 'page.template.html').read_text()
+    html = (ROOT / 'src' / 'page.template.html').read_text()
     css = (ROOT / 'style.css').read_text()
     js = (ROOT / 'transcribe.js').read_text() + '\n' + (ROOT / 'app-shell.js').read_text()
     html = html.replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
@@ -20,9 +20,11 @@ def build():
     html = html.replace('<script src="transcribe.js"></script><script src="app-shell.js"></script>', script)
     (ROOT / 'demo.html').write_text(html)
     (ROOT / 'index.html').write_text(html)
+    # Keep the historically shared filename previewable as a complete app too.
+    (ROOT / 'page.template.html').write_text(html)
     build = hashlib.sha256(html.encode()).hexdigest()[:12]
     (ROOT / 'sw.js').write_text((ROOT / 'sw.template.js').read_text().replace('__BUILD__', build))
-    print('Built index.html and demo.html (fully offline, no external resources)')
+    print('Built index.html, demo.html, and page.template.html (fully offline)')
 
 if __name__ == '__main__':
     build()
