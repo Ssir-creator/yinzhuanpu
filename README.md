@@ -1,4 +1,4 @@
-# 弦镜 · 轮指均匀度观察室 v0.3
+# 弦镜 · 轮指均匀度观察室 v0.4
 
 ## 网站发布
 
@@ -33,7 +33,7 @@
 
 ## 开发
 
-修改 `page.template.html`、`style.css`、`app.js` 后运行：
+修改 `page.template.html`、`style.css`、`app.js`、`practice.js` 后运行：
 
 ```bash
 python scripts/build_standalone.py
@@ -43,3 +43,12 @@ python -m http.server 8000 --bind 0.0.0.0
 素材可用标准库脚本 `python scripts/generate_audio.py` 重建。无需 npm / pip 依赖。
 
 启动服务后运行 `python tests/smoke.py`（需已有 Playwright / Chromium）；换端口时用 `DEMO_URL=http://127.0.0.1:8001 python tests/smoke.py`。云端 Chromium 管理策略阻止 file:// 导航，因此离线测试在禁网页面载入同一份 HTML 内容，不改动浏览器策略。
+
+## 直接录音与练习记录（v0.4）
+
+- 点击“开始录音”才请求麦克风。可选择参考 / 练习侧，5 / 10 / 20 秒自动结束，也可提前完成。要求 HTTPS 或 localhost，以及支持 getUserMedia / MediaRecorder 的浏览器。拒绝授权时可继续导入音频。
+- 录制前停止已有播放；录制期间锁定导入和分析操作。完成或离开页面时释放麦克风，不边录边播放自己的输入。请求关闭回声消除、自动增益与降噪，但设备可能不支持这些选项，仍需检查录音条件。
+- “将练习侧设为上一遍”复制录音和选区到参考侧，随后录入新的一遍到练习侧；每次替换后必须重新确认可比条件。
+- “保存练习侧”主动保存录音、选区、300 字以内笔记与摘要到当前浏览器 IndexedDB，最多 10 条。不保存合成演示、不自动删除旧记录。可分别恢复到参考 / 练习侧，下载 WAV 备份或删除记录。
+- 本地记录不跨设备同步，清除浏览器数据会丢失。私密模式和单文件页面可能限制存储，请使用网站或下载 WAV。
+- `python tests/practice.py` 验证模拟麦克风、手动 / 自动停止、资源释放、授权拒绝、复制上一遍、本地保存 / 刷新恢复 / 删除、WAV 备份及布局；这是模拟设备验证，不代表已测试真实手机或麦克风。可通过 DEMO_URL 指定测试端口。

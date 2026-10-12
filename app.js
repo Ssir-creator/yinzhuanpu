@@ -32,7 +32,7 @@ function status(message, error = false) {
 }
 function setBusy(value) {
   busy = value;
-  document.querySelectorAll('[data-play], [data-upload], #listen, #export').forEach(el => {
+  document.querySelectorAll('[data-play], [data-upload], [data-technique], [data-region], [data-clip], #listen, #export, #promote, #save-practice').forEach(el => {
     el.disabled = value || !tracks.reference || !tracks.practice;
   });
 }
