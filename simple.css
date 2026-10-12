@@ -1,0 +1,13 @@
+.settings-card .transcribe-button {
+  margin-top: 22px;
+}
+
+.advanced-settings {
+  margin-top: 18px !important;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.advanced-settings .settings-grid {
+  margin-bottom: 8px;
+}

@@ -12,7 +12,7 @@ def build():
         raise RuntimeError('Generate demo-melody.wav first: python scripts/generate_audio.py')
     audio = base64.b64encode(demo.read_bytes()).decode('ascii')
     html = (ROOT / 'src' / 'page.template.html').read_text()
-    css = (ROOT / 'style.css').read_text()
+    css = (ROOT / 'style.css').read_text() + '\n' + (ROOT / 'simple.css').read_text()
     js = (ROOT / 'transcribe.js').read_text() + '\n' + (ROOT / 'app-shell.js').read_text()
     html = html.replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
     script = '<script>window.DEMO_AUDIO=' + json.dumps(audio) + ';</script><script>' + js.replace('</script', '<\\/script') + '</script>'
