@@ -7,16 +7,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 def build():
-    audio = {p.name: base64.b64encode(p.read_bytes()).decode('ascii') for p in sorted((ROOT / 'assets').glob('roll-*.wav'))}
-    if len(audio) != 2:
-        raise RuntimeError('Generate the two roll audio fixtures first: python scripts/generate_audio.py')
+    demo = ROOT / 'assets' / 'demo-melody.wav'
+    if not demo.exists():
+        raise RuntimeError('Generate demo-melody.wav first: python scripts/generate_audio.py')
+    audio = base64.b64encode(demo.read_bytes()).decode('ascii')
     html = (ROOT / 'page.template.html').read_text()
     css = (ROOT / 'style.css').read_text()
-    js = (ROOT / 'app.js').read_text() + '\n' + (ROOT / 'practice.js').read_text() + '\n' + (ROOT / 'app-shell.js').read_text()
+    js = (ROOT / 'transcribe.js').read_text() + '\n' + (ROOT / 'app-shell.js').read_text()
     html = html.replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
     script = '<script>window.DEMO_AUDIO=' + json.dumps(audio) + ';</script><script>' + js.replace('</script', '<\\/script') + '</script>'
     # Run after the body exists; inline classic scripts do not honor defer.
-    html = html.replace('<script src="app.js" defer></script>', '').replace('</body>', script + '</body>')
+    html = html.replace('<script src="transcribe.js"></script><script src="app-shell.js"></script>', script)
     (ROOT / 'demo.html').write_text(html)
     (ROOT / 'index.html').write_text(html)
     build = hashlib.sha256(html.encode()).hexdigest()[:12]

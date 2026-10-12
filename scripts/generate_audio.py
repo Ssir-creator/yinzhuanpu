@@ -38,14 +38,30 @@ def render(technique, learner):
     scale = .75 / max(max(abs(v) for v in samples), 1.2)
     return [max(-32767, min(32767, int(v * scale * 32767))) for v in samples]
 
+def melody():
+    sequence = [60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60]
+    beat = .6
+    samples = [0.0] * int(RATE * (len(sequence) * beat + .2))
+    for index, midi in enumerate(sequence):
+        start = int((.1 + index * beat) * RATE)
+        frequency = 440 * 2 ** ((midi - 69) / 12)
+        for j in range(min(int(.48 * RATE), len(samples) - start)):
+            t = j / RATE
+            envelope = min(t / .006, 1) * math.exp(-t / .18)
+            samples[start + j] += .55 * envelope * (
+                math.sin(2 * math.pi * frequency * t)
+                + .22 * math.sin(4 * math.pi * frequency * t)
+            )
+    return [max(-32767, min(32767, int(value * 32767))) for value in samples]
+
+
 if __name__ == '__main__':
     ROOT.mkdir(exist_ok=True)
-    for technique in ['roll']:
-        for learner in [False, True]:
-            path = ROOT / f'{technique}-{"practice" if learner else "reference"}.wav'
-            with wave.open(str(path), 'wb') as output:
-                output.setnchannels(1)
-                output.setsampwidth(2)
-                output.setframerate(RATE)
-                output.writeframes(struct.pack('<' + 'h' * RATE * LENGTH, *render(technique, learner)))
-            print(path.name)
+    path = ROOT / 'demo-melody.wav'
+    data = melody()
+    with wave.open(str(path), 'wb') as output:
+        output.setnchannels(1)
+        output.setsampwidth(2)
+        output.setframerate(RATE)
+        output.writeframes(struct.pack('<' + 'h' * len(data), *data))
+    print(path.name)

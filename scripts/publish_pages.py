@@ -23,7 +23,7 @@ def publish():
     parent = remote.split()[0] if remote else None
     if parent:
         git('fetch', '--no-tags', 'origin', 'refs/heads/gh-pages')
-    with tempfile.TemporaryDirectory(prefix='string-lens-publish-') as tmp:
+    with tempfile.TemporaryDirectory(prefix='audio-score-publish-') as tmp:
         env = os.environ.copy()
         env['GIT_INDEX_FILE'] = str(Path(tmp) / 'index')
         env['GIT_AUTHOR_NAME'] = env['GIT_COMMITTER_NAME'] = 'github-actions[bot]'
@@ -40,7 +40,7 @@ def publish():
             print('gh-pages already contains this build; no update needed.')
             return
         source = git('rev-parse', '--short', 'HEAD')
-        args = ['commit-tree', tree, '-m', f'Publish String Lens from {source}']
+        args = ['commit-tree', tree, '-m', f'Publish Audio to Score from {source}']
         if parent:
             args.extend(['-p', parent])
         commit = git(*args, env=env)

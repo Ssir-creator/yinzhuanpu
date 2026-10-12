@@ -1,40 +1,25 @@
 'use strict';
-window.showScreen = function(name, updateHash = true) {
-  if (!['practice','compare','history'].includes(name)) name='practice';
-  document.querySelectorAll('.app-screen').forEach(section=>section.hidden=section.id!==`screen-${name}`);
-  document.querySelectorAll('[data-screen]').forEach(button=>{
-    if(button.dataset.screen===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
-  });
-  if(updateHash) history.replaceState(null,'',`#${name}`);
-  if(name==='compare') { sides.forEach(render); renderRollReview(); }
-  window.scrollTo(0,0);
+window.showScreen=function(name){
+  if(!['transcribe','library','about'].includes(name))name='transcribe';
+  document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==`screen-${name}`);
+  document.querySelectorAll('[data-screen]').forEach(b=>b.toggleAttribute('aria-current',b.dataset.screen===name));
+  history.replaceState(null,'',`#${name}`);scrollTo(0,0);
 };
-document.querySelectorAll('[data-screen],[data-go]').forEach(button=>button.addEventListener('click',()=>showScreen(button.dataset.screen||button.dataset.go)));
-window.addEventListener('hashchange',()=>showScreen(location.hash.slice(1),false));
-showScreen(location.hash.slice(1),false);
-let installPrompt=null, waitingWorker=null;
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;$('#install-app').textContent='安装 App';});
-$('#install-app').addEventListener('click',async()=>{
-  if(installPrompt){const prompt=installPrompt;installPrompt=null;await prompt.prompt();await prompt.userChoice;return;}
-  $('#install-help-text').textContent=/iPhone|iPad|iPod/.test(navigator.userAgent)
-    ? '在 Safari 中打开本站，点“分享”，选择“添加到主屏幕”。不要使用聊天软件的内置浏览器。'
-    : '在 Chrome / Edge 的浏览器菜单中选择“安装应用”或“添加到主屏幕”。若没有该选项，请联网打开本站并刷新；桌面浏览器也可安装。';
+document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
+showScreen(location.hash.slice(1));
+let installPrompt=null,waitingWorker=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
+$('#install-app').onclick=async()=>{
+  if(installPrompt){await installPrompt.prompt();installPrompt=null;return;}
+  $('#install-help-text').textContent=/iPhone|iPad/.test(navigator.userAgent)
+    ?'请用 Safari 打开，点“分享”→“添加到主屏幕”。'
+    :'请在 Chrome / Edge 菜单中选择“安装应用”或“添加到主屏幕”。';
   $('#install-help').showModal();
+};
+$('#close-install').onclick=()=>$('#install-help').close();
+$('#apply-update').onclick=()=>waitingWorker?.postMessage({type:'ACTIVATE_UPDATE'});
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').then(reg=>{
+  const offer=()=>{waitingWorker=reg.waiting;if(waitingWorker)$('#app-update').hidden=false};
+  offer();reg.onupdatefound=()=>{const worker=reg.installing;if(worker)worker.onstatechange=()=>worker.state==='installed'&&navigator.serviceWorker.controller&&offer()};
+  navigator.serviceWorker.oncontrollerchange=()=>location.reload();
 });
-$('#close-install').addEventListener('click',()=>$('#install-help').close());
-$('#apply-update').addEventListener('click',()=>{
-  if(recordingPending||busy){$('#app-update span').textContent='请先完成录音和处理，再更新';return;}
-  waitingWorker?.postMessage({type:'ACTIVATE_UPDATE'});
-});
-if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-  let refreshing=false, updateRequested=false;
-  $('#apply-update').addEventListener('click',()=>{if(!busy&&!recordingPending)updateRequested=true;});
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(updateRequested&&!refreshing){refreshing=true;location.reload();}});
-  navigator.serviceWorker.register('./sw.js').then(registration=>{
-    const offer=()=>{waitingWorker=registration.waiting;if(waitingWorker)$('#app-update').hidden=false;};
-    offer();registration.addEventListener('updatefound',()=>{
-      const worker=registration.installing;
-      worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)offer();});
-    });
-  }).catch(()=>{ $('#install-app').textContent='添加到手机'; });
-}
