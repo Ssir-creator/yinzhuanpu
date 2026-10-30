@@ -1,3 +1,11 @@
 __pycache__/
 *.pyc
 demo.html
+
+# Local research data and trained weights are too large for Git.
+ml/data/raw/
+ml/data/annotations/
+ml/data/manifest.csv
+ml/data/dataset_report.json
+ml/checkpoints/
+ml/exports/

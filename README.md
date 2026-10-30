@@ -42,3 +42,15 @@ DEMO_URL=http://127.0.0.1:8000 python tests/transcription.py
 Android 可在 Chrome 中安装到主屏幕；iPhone 使用 Safari 的“分享 → 添加到主屏幕”。首次联网加载完成后，应用可离线打开并处理本地音频。
 
 `.github/workflows/publish-pages.yml` 在 `main` 更新时构建并发布到 GitHub Pages。也可以运行 `python scripts/publish_pages.py` 准备发布文件。Service worker 的缓存版本由构建脚本根据页面内容生成。
+
+## 琵琶模型研究
+
+当前线上版本使用浏览器音高算法，尚未声称接入训练模型。`ml/` 提供下一阶段的真实实验工具：按录音场次审计和划分 WAV 数据、生成可追踪的 manifest，以及用独立标注计算音符级 Precision、Recall、F1 和时间误差。
+
+把真实录音按场次放入 `ml/data/raw/<session>/` 后运行：
+
+```bash
+python ml/prepare_dataset.py
+```
+
+数据要求、标注格式、PESTO 域适配路线和模型卡模板见 `ml/README.md`。运行 `python tests/model_data.py` 验证数据划分和评估工具。
