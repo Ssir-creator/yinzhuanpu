@@ -53,4 +53,4 @@ Android 可在 Chrome 中安装到主屏幕；iPhone 使用 Safari 的“分享 
 python ml/prepare_dataset.py
 ```
 
-数据要求、标注格式、PESTO 域适配路线和模型卡模板见 `ml/README.md`。运行 `python tests/model_data.py` 验证数据划分和评估工具。
+数据要求、标注格式、PESTO 域适配路线和模型卡模板见 `ml/README.md`；已核查的公开琵琶数据及许可边界见 `ml/PUBLIC_DATASETS.md`。运行 `python tests/model_data.py` 验证数据划分和评估工具。
