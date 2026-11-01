@@ -28,6 +28,8 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     assert [note['midi'] for note in result] == EXPECTED, result
     assert all(note['beats'] == 1 for note in result), result
     assert page.locator('.score-note').count() == 14
+    assert page.locator('.jianpu-measure').count() == 4
+    assert page.locator('#print-score').is_visible()
     assert '1=C' in page.locator('.score-meta').inner_text()
     # Manual correction must update the underlying score.
     page.locator('.score-note').first.click()
@@ -39,6 +41,7 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     assert page.evaluate('notes[0].midi') == 61
     page.locator('[data-edit="longer"]').click()
     assert page.evaluate('notes[0].beats') == 1.5
+    assert page.locator('.augmentation-dot').count() >= 1
     page.locator('[data-edit="rest"]').click()
     assert page.evaluate('notes[0].rest') is True
     page.locator('[data-edit="rest"]').click()
@@ -64,7 +67,7 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     page.locator('[data-screen="library"]').click()
     assert page.locator('.library-entry').count() == 1
     page.locator('.library-entry button', has_text='打开').click()
-    assert page.locator('.score-note').count() == 14
+    assert page.evaluate('notes.length') == 14
     overflow = page.evaluate("""[...document.querySelectorAll('*')].filter(el => el.getBoundingClientRect().right > innerWidth + 1).map(el => [el.tagName, el.className, Math.round(el.getBoundingClientRect().right), el.scrollWidth])""")
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), overflow
     page.screenshot(path='/tmp/audio-to-score-mobile.png', full_page=True)
