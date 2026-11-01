@@ -49,3 +49,231 @@
   color: var(--muted);
   font-size: 11px;
 }
+
+/* Numbered notation is laid out on a beat grid instead of as a text stream. */
+.score.jianpu-score {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 34px 0;
+  align-items: stretch;
+  min-height: 160px;
+  padding: 42px 0 32px;
+  overflow: visible;
+}
+
+.jianpu-measure {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--slots), minmax(0, 1fr));
+  align-items: end;
+  min-width: 0;
+  min-height: 68px;
+  padding: 8px 8px 12px;
+}
+
+.jianpu-measure::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  height: 34px;
+  border-right: 1px solid var(--ink);
+}
+
+.jianpu-cell {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 0;
+  height: 52px;
+}
+
+.jianpu-cell .score-note {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 5px 1px 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: "Times New Roman", "Songti SC", serif;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.jianpu-cell .score-note:hover,
+.jianpu-cell .score-note.selected {
+  background: var(--soft);
+}
+
+.jianpu-cell .score-note.low-confidence {
+  color: var(--accent);
+}
+
+.jianpu-cell.beam-one::after,
+.jianpu-cell.beam-two::after,
+.jianpu-cell.beam-two::before {
+  content: "";
+  position: absolute;
+  right: 10%;
+  left: 10%;
+  bottom: 6px;
+  border-bottom: 1px solid currentColor;
+  pointer-events: none;
+}
+
+.jianpu-cell.beam-two::before {
+  bottom: 2px;
+}
+
+.score-note .numeral {
+  display: inline-block;
+  min-width: .72em;
+  text-align: center;
+}
+
+.score-note .accidental {
+  width: .72em;
+  margin-left: -.72em;
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  text-align: right;
+  transform: translate(-2px, -2px);
+}
+
+.score-note .augmentation-dot {
+  margin-left: 2px;
+  font-size: 17px;
+  transform: translateY(3px);
+}
+
+.score-note .hold {
+  margin-left: 5px;
+  font-size: 18px;
+  letter-spacing: 4px;
+  white-space: nowrap;
+}
+
+.score-note .continued-dash {
+  font-size: 18px;
+}
+
+.jianpu-cell .score-note .octave {
+  position: absolute;
+  left: 50%;
+  width: 100%;
+  transform: translateX(-50%);
+  font-family: serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.jianpu-cell .score-note .octave.high {
+  top: -3px;
+}
+
+.jianpu-cell .score-note .octave.low {
+  bottom: 3px;
+}
+
+.jianpu-cell.beam-one .score-note .octave.low {
+  bottom: -2px;
+}
+
+.jianpu-cell.beam-two .score-note .octave.low {
+  bottom: -6px;
+}
+
+.measure-space {
+  min-width: 0;
+}
+
+@media (max-width: 620px) {
+  .score.jianpu-score {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 0;
+    padding: 34px 0 26px;
+  }
+
+  .jianpu-measure {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .jianpu-cell .score-note {
+    font-size: 24px;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 18mm;
+  }
+
+  body.printing-score {
+    background: #fff;
+  }
+
+  body.printing-score .topbar,
+  body.printing-score .screen-title,
+  body.printing-score .source-card,
+  body.printing-score .settings-card,
+  body.printing-score .score-heading,
+  body.printing-score .edit-hint,
+  body.printing-score .note-editor,
+  body.printing-score .history-actions,
+  body.printing-score .result-actions,
+  body.printing-score .bottom-nav,
+  body.printing-score #app-update {
+    display: none !important;
+  }
+
+  body.printing-score .screen,
+  body.printing-score .score-section {
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+  }
+
+  body.printing-score .score-title-field {
+    margin: 0 0 22px;
+  }
+
+  body.printing-score .score-title-field span {
+    display: none;
+  }
+
+  body.printing-score .score-title-field input {
+    border: 0;
+    color: #000;
+    font-size: 25px;
+    text-align: center;
+  }
+
+  body.printing-score .score-meta {
+    color: #000;
+  }
+
+  body.printing-score .score.jianpu-score {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 38px 0;
+    color: #000;
+    padding-top: 38px;
+  }
+
+  body.printing-score .jianpu-measure::after {
+    border-right-color: #000;
+  }
+}
