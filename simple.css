@@ -1,0 +1,51 @@
+.settings-card .transcribe-button {
+  margin-top: 22px;
+}
+
+.advanced-settings {
+  margin-top: 18px !important;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.advanced-settings .settings-grid {
+  margin-bottom: 8px;
+}
+
+.score-title-field {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0 16px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.score-title-field input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 8px 0;
+  color: var(--ink);
+  font-family: serif;
+  font-size: 20px;
+}
+
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.history-actions button {
+  border: 1px solid var(--line);
+  background: transparent;
+  padding: 7px 11px;
+}
+
+.history-actions span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
