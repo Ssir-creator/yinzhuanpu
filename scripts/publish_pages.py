@@ -35,7 +35,10 @@ def publish():
             ('demo.html', (ROOT / 'demo.html').read_bytes()),
             ('.nojekyll', b''),
         ]
-        for name in ['manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'icons/icon-512.png']:
+        for name in [
+            'style.css', 'simple.css', 'demo-audio.js', 'transcribe.js', 'app-shell.js',
+            'manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'icons/icon-512.png',
+        ]:
             files.append((name, (ROOT / name).read_bytes()))
         for name, contents in files:
             blob = git('hash-object', '-w', '--stdin', content=contents)
