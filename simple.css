@@ -50,6 +50,41 @@
   font-size: 11px;
 }
 
+body.is-live #source-status,
+body.is-live #confidence-label {
+  color: var(--accent);
+}
+
+body.is-live #confidence-label {
+  border-color: var(--accent);
+}
+
+body.is-live #source-status::first-letter {
+  animation: live-pulse 1s ease-in-out infinite;
+}
+
+body.is-live .settings-grid,
+body.is-live .advanced-settings {
+  opacity: .55;
+  pointer-events: none;
+}
+
+.source-actions label {
+  position: relative;
+}
+
+.source-actions label input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes live-pulse {
+  50% { opacity: .28; }
+}
+
 /* Numbered notation is laid out on a beat grid instead of as a text stream. */
 .score.jianpu-score {
   display: grid;
