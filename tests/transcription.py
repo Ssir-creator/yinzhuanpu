@@ -33,11 +33,16 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     page.locator('.score-note').first.click()
     page.locator('[data-edit="up"]').click()
     assert page.evaluate('notes[0].midi') == 61
+    page.locator('#undo-edit').click()
+    assert page.evaluate('notes[0].midi') == 60
+    page.locator('#redo-edit').click()
+    assert page.evaluate('notes[0].midi') == 61
     page.locator('[data-edit="longer"]').click()
     assert page.evaluate('notes[0].beats') == 1.5
     page.locator('[data-edit="rest"]').click()
     assert page.evaluate('notes[0].rest') is True
     page.locator('[data-edit="rest"]').click()
+    page.locator('#score-title').fill('小星星校对稿')
     # Both export formats contain the edited result.
     for selector, filename, marker in [('#export-text', 'score.txt', b'1=C'), ('#export-xml', 'score.musicxml', b'<score-partwise')]:
         with page.expect_download() as info:
@@ -46,9 +51,14 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
         info.value.save_as(str(output))
         assert marker in output.read_bytes()
         if output.suffix == '.musicxml':
-            assert ElementTree.parse(output).getroot().tag == 'score-partwise'
+            root = ElementTree.parse(output).getroot()
+            assert root.tag == 'score-partwise'
+            assert root.findtext('./work/work-title') == '小星星校对稿'
+            measures = root.findall('./part/measure')
+            assert len(measures) == 4
+            assert all(sum(int(note.findtext('duration')) for note in measure.findall('note')) <= 16 for measure in measures)
+    page.locator('#save-score-direct').click()
     page.locator('[data-screen="library"]').click()
-    page.locator('#save-score').click()
     assert page.locator('.library-entry').count() == 1
     page.reload()
     page.locator('[data-screen="library"]').click()
@@ -59,5 +69,5 @@ with sync_playwright() as p, tempfile.TemporaryDirectory() as tmp:
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), overflow
     page.screenshot(path='/tmp/audio-to-score-mobile.png', full_page=True)
     assert not errors, errors
-    print('PASS: known 14-note melody, exact MIDI sequence, quarter-note quantization, note editing, text/MusicXML export, local save/restore, mobile layout.')
+    print('PASS: known melody, note editing with undo/redo, measured MusicXML export, direct save/restore, and mobile layout.')
     browser.close()
