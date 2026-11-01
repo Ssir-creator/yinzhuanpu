@@ -55,6 +55,55 @@ body.is-live #confidence-label {
   color: var(--accent);
 }
 
+body.is-live .screen-title,
+body.is-live .settings-card,
+body.is-live .source-card .card-title,
+body.is-live #record,
+body.is-live .source-actions label,
+body.is-live #load-demo,
+body.is-live .edit-hint,
+body.is-live .note-editor,
+body.is-live .history-actions,
+body.is-live .result-actions,
+body.is-live .bottom-nav {
+  display: none !important;
+}
+
+body.is-live .screen {
+  padding-top: 0;
+  padding-bottom: 24px;
+}
+
+body.is-live .source-card {
+  position: sticky;
+  z-index: 12;
+  top: 0;
+  margin: 0 -1px 12px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 20px rgba(36, 33, 29, .08);
+}
+
+body.is-live .source-actions {
+  margin: 0 0 6px;
+}
+
+body.is-live #stop-record {
+  display: block;
+  width: 100%;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+body.is-live #source-status {
+  min-height: 0;
+  margin: 0;
+  text-align: center;
+}
+
+body.is-live .score-section {
+  margin-bottom: 0;
+}
+
 body.is-live #confidence-label {
   border-color: var(--accent);
 }
