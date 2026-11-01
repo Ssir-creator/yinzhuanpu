@@ -1,0 +1,7 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080c13"><title>弦生 · 琵琶声音实验</title><link rel="stylesheet" href="particles.css?v=1"></head><body>
+<canvas id="stage" aria-label="琵琶声音驱动的粒子舞台"></canvas>
+<header><a href="particles.html" class="brand">弦生<span>STRING / FORM</span></a><span class="edition">声音可视化实验 · 01</span><button id="fullscreen">全屏 ↗</button></header>
+<main><div class="intro"><span class="eyebrow">让余音，有迹可循。</span><h1>一弦起，<br>万象生。</h1><p>拨弦的瞬间化作涟漪，<br>让声音在空间里留下形状。</p></div><div id="hint">移动指针旋转视角 · 点击舞台拨动一根弦</div></main>
+<aside class="readout"><span id="mode">待机 / 点击演示开始</span><div><b id="energy">00</b><span>声音能量</span></div><div class="meter"><i id="meter"></i></div><p id="status" role="status">选择演示，或打开麦克风弹奏琵琶。</p></aside>
+<footer><div class="actions"><button id="demo" class="primary">▶ 听见弦声</button><button id="mic">打开麦克风</button><button id="stop" disabled>停止</button></div><div class="styles" role="group" aria-label="粒子形态"><button data-style="string" aria-pressed="true">01 弦流</button><button data-style="ripple" aria-pressed="false">02 涟漪</button><button data-style="nebula" aria-pressed="false">03 星云</button></div><button id="capture">保存画面 ↓</button><label class="upload">导入音频<input id="file" type="file" accept="audio/*"></label><span class="note">演示为合成拨弦音色 · 非真实琵琶录音</span></footer>
+<script src="particles.js?v=1"></script></body></html>
