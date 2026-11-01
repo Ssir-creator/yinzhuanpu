@@ -3,7 +3,7 @@ window.showScreen=function(name){
   if(!['transcribe','library','about'].includes(name))name='transcribe';
   document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==`screen-${name}`);
   document.querySelectorAll('[data-screen]').forEach(b=>b.toggleAttribute('aria-current',b.dataset.screen===name));
-  history.replaceState(null,'',`#${name}`);scrollTo(0,0);
+  const current=new URL(location.href);current.hash=name;history.replaceState(null,'',current);scrollTo(0,0);
 };
 document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
 showScreen(location.hash.slice(1));
