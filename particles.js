@@ -1,18 +1,18 @@
 'use strict';
 const canvas=document.querySelector('#stage'),ctx=canvas.getContext('2d'),$=s=>document.querySelector(s);
-let w,h,dpr,ac,analyser,source,stream,audio,blobUrl,timer,mode='idle',style='galaxy',energy=0,bass=0,treble=0,previous=0,lastAttack=0,time=0,rotation=0,targetRotation=0,waves=[],raf,lastTime=0,touring=false,tourStarted=0,sceneStarted=0,showStep=0,showNodes=[],demoTimeouts=[],tension=1.2,galaxyDrive=0;
+let w,h,dpr,ac,analyser,source,stream,audio,blobUrl,timer,mode='idle',style='cloud',energy=0,bass=0,treble=0,previous=0,lastAttack=0,time=0,rotation=0,targetRotation=0,waves=[],raf,lastTime=0,touring=false,tourStarted=0,sceneStarted=0,showStep=0,showNodes=[],demoTimeouts=[],tension=1.2,galaxyDrive=0;
 const points=Array.from({length:14000},(_,i)=>({u:Math.random(),v:Math.random(),seed:Math.random(),line:i%4}));
 function resize(){dpr=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
 addEventListener('resize',resize);resize();
 function audioContext(){return ac||(ac=new AudioContext())}
 function setupAnalyser(){analyser=audioContext().createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=.65;return analyser}
 function attack(strength=1){waves.push({born:time,strength});if(waves.length>20)waves.shift()}
-function stop(){touring=false;$('#tour').textContent='▶ 一键巡演 · 五种效果';demoTimeouts.forEach(clearTimeout);demoTimeouts=[];showNodes.forEach(n=>{try{n.stop()}catch{}});showNodes=[];clearInterval(timer);timer=null;if(audio){audio.pause();audio.src='';audio=null}source?.disconnect();source=null;stream?.getTracks().forEach(t=>t.stop());stream=null;if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null}analyser?.disconnect();analyser=null;mode='idle';$('#mode').textContent='待机 / 余音消散';$('#status').textContent='可以切换形态，再听一次。';$('#stop').disabled=true;$('#demo').textContent=style==='galaxy'?'▶ 观看星河风暴':'▶ 观看当前方案';$('#mic').textContent='打开麦克风'}
+function stop(){touring=false;$('#tour').textContent='▶ 一键巡演 · 六种效果';demoTimeouts.forEach(clearTimeout);demoTimeouts=[];showNodes.forEach(n=>{try{n.stop()}catch{}});showNodes=[];clearInterval(timer);timer=null;if(audio){audio.pause();audio.src='';audio=null}source?.disconnect();source=null;stream?.getTracks().forEach(t=>t.stop());stream=null;if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null}analyser?.disconnect();analyser=null;mode='idle';$('#mode').textContent='待机 / 余音消散';$('#status').textContent='可以切换形态，再听一次。';$('#stop').disabled=true;$('#demo').textContent=style==='galaxy'?'▶ 观看星河风暴':'▶ 观看当前方案';$('#mic').textContent='打开麦克风'}
 function active(kind){mode=kind;$('#stop').disabled=false;$('#mode').textContent=kind==='mic'?'LIVE / 麦克风':kind==='file'?'AUDIO / 导入音频':'DEMO / 合成拨弦';$('#status').textContent=kind==='mic'?'正在聆听。弹奏单音或连续拨弦，观察粒子变化。':kind==='file'?'粒子由当前音频的音量、频谱与起音驱动。':'合成拨弦演示。可打开麦克风换成你的琵琶。'}
 function pluck(freq,length=.65,volume=.55){const a=audioContext(),rate=a.sampleRate,n=Math.floor(rate*length),buffer=a.createBuffer(1,n,rate),data=buffer.getChannelData(0),period=Math.max(2,Math.round(rate/freq));for(let i=0;i<period;i++)data[i]=Math.random()*2-1;for(let i=period;i<n;i++)data[i]=.495*(data[i-period]+data[Math.max(0,i-period-1)]);const s=a.createBufferSource(),g=a.createGain();s.buffer=buffer;g.gain.value=volume;s.connect(g).connect(analyser);g.connect(a.destination);s.start();showNodes.push(s);s.onended=()=>{s.disconnect();g.disconnect();showNodes=showNodes.filter(node=>node!==s)}}
 function performStep(){
  const elapsed=time-sceneStarted,phase=elapsed<4?'轻拨 · 观察单次回应':elapsed<10?'渐密 · 织起空间纹理':elapsed<15?'强奏 · 展开全部气势':'余韵 · 看粒子消散';
- $('#chapter').textContent=`${Object.keys(schemes).indexOf(style)+1} / 5 · ${phase}`;
+ $('#chapter').textContent=`${Object.keys(schemes).indexOf(style)+1} / 6 · ${phase}`;
  $('#chapter-progress').style.width=`${Math.min(100,elapsed/18*100)}%`;
  const melody=[293.66,440,587.33,659.25,587.33,440,392,329.63,293.66,392,440,587.33],freq=melody[showStep%melody.length];
  if(elapsed<15){const strong=elapsed>=10,volume=strong?.85:elapsed<4?.35:.55;pluck(freq,.9,volume);
@@ -20,9 +20,9 @@ function performStep(){
  if(strong&&showStep%3===0){pluck(freq/2,1.1,.7);attack(1.5)}
  }
  showStep++;
- if(elapsed>=18){if(touring){const keys=Object.keys(schemes),next=keys.indexOf(style)+1;if(next<keys.length){selectStyle(keys[next]);sceneStarted=time;showStep=0;$('#status').textContent=`自动巡演 ${next+1}/5：${schemes[keys[next]][0].replace(/<br>|。/g,'')}`;}else{stop();$('#chapter').textContent='五幕结束 · 点击方案按钮重看，或再次巡演';$('#chapter-progress').style.width='100%';$('#status').textContent='五种效果已展示完毕。告诉我最喜欢的编号。'}}else{sceneStarted=time;showStep=0}}
+ if(elapsed>=18){if(touring){const keys=Object.keys(schemes),next=keys.indexOf(style)+1;if(next<keys.length){selectStyle(keys[next]);sceneStarted=time;showStep=0;$('#status').textContent=`自动巡演 ${next+1}/6：${schemes[keys[next]][0].replace(/<br>|。/g,'')}`;}else{stop();$('#chapter').textContent='六幕结束 · 点击方案按钮重看，或再次巡演';$('#chapter-progress').style.width='100%';$('#status').textContent='六种效果已展示完毕。告诉我最喜欢的编号。'}}else{sceneStarted=time;showStep=0}}
 }
-async function startShow(all){stop();try{await audioContext().resume();setupAnalyser();active('demo');touring=all;if(all)selectStyle('galaxy');sceneStarted=time;tourStarted=time;showStep=0;$('#tour').textContent=all?'■ 停止巡演':'▶ 一键巡演 · 五种效果';$('#demo').textContent='↻ 重看当前方案';$('#status').textContent=all?'自动巡演中，每幕18秒；无需麦克风。':'当前方案循环演示：轻拨 → 渐密 → 强奏 → 余韵。';performStep();timer=setInterval(performStep,450)}catch(e){stop();$('#status').textContent='无法播放声音，请在 Chrome 或 Edge 中打开重试。'}}
+async function startShow(all){stop();try{await audioContext().resume();setupAnalyser();active('demo');touring=all;if(all)selectStyle('cloud');sceneStarted=time;tourStarted=time;showStep=0;$('#tour').textContent=all?'■ 停止巡演':'▶ 一键巡演 · 六种效果';$('#demo').textContent='↻ 重看当前方案';$('#status').textContent=all?'自动巡演中，每幕18秒；无需麦克风。':'当前方案循环演示：轻拨 → 渐密 → 强奏 → 余韵。';performStep();timer=setInterval(performStep,450)}catch(e){stop();$('#status').textContent='无法播放声音，请在 Chrome 或 Edge 中打开重试。'}}
 $('#demo').onclick=()=>startShow(false);
 $('#tension').oninput=e=>tension=Number(e.target.value);
 $('#immersive').onclick=()=>{const enabled=document.body.classList.toggle('immersive');$('#immersive').setAttribute('aria-pressed',String(enabled));$('#immersive').textContent=enabled?'退出沉浸':'沉浸模式'};
@@ -30,11 +30,11 @@ $('#tour').onclick=()=>touring?stop():startShow(true);
 $('#mic').onclick=async()=>{stop();$('#status').textContent='正在请求麦克风权限…';try{if(!navigator.mediaDevices?.getUserMedia)throw Error('需要在 HTTPS 页面或本机浏览器中使用麦克风');await audioContext().resume();const incoming=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});stream=incoming;setupAnalyser();source=ac.createMediaStreamSource(stream);source.connect(analyser);active('mic');$('#mic').textContent='● 麦克风已连接'}catch(e){stop();$('#status').textContent=e.name==='NotAllowedError'?'未获得麦克风权限。可以先使用演示或导入音频。':e.message}};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;stop();try{await audioContext().resume();setupAnalyser();blobUrl=URL.createObjectURL(f);audio=new Audio(blobUrl);source=ac.createMediaElementSource(audio);source.connect(analyser);analyser.connect(ac.destination);await audio.play();active('file');$('#status').textContent=`正在播放：${f.name}`;audio.onended=stop}catch(e){stop();$('#status').textContent='无法播放此音频，请尝试 WAV 或 MP3。'}};
 $('#stop').onclick=stop;
-const schemes={galaxy:['星河<br>风暴。','置身旋转星系，让每次拨弦<br>掀起一场向外蔓延的风暴。'],mountains:['万仞<br>山海。','声音抬升群山，拨弦卷起云海。<br>在山脊与潮汐之间，看见余韵。'],dragon:['游龙<br>入海。','金色长带穿越深空，<br>连续拨弦，让游龙奔涌。'],aurora:['天幕<br>极光。','声音撑开垂落的天幕，<br>每一次起伏，都是一道光。'],rift:['弦裂<br>天地。','四弦悬于暗场。<br>一声拨响，粒子洪流破空而出。']};
-function selectStyle(name){style=name;waves=[];ctx.fillStyle='#080c13';ctx.fillRect(0,0,w,h);document.querySelectorAll('[data-style]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.style===name));$('.intro h1').innerHTML=schemes[name][0];$('.intro p').innerHTML=schemes[name][1];sceneStarted=time;attack(1.25)}
-document.querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{selectStyle(b.dataset.style);if(mode==='demo'){touring=false;sceneStarted=time;showStep=0;$('#tour').textContent='▶ 一键巡演 · 五种效果'}else startShow(false)});
+const schemes={cloud:['呼吸<br>粒子云。','一团光尘随声音聚散。<br>听见轻拨，看见呼吸。'],ribbon:['丝带<br>流场。','起音沿光丝传播，<br>余韵在空间里舒展、缠绕。'],water:['粒子<br>水面。','每一次拨弦，激起一圈涟漪。<br>让声波相遇，然后平息。'],ring:['声纹<br>光环。','频谱在环上展开，<br>让声音的明暗有迹可循。'],sand:['共振<br>沙场。','声音牵引光沙，聚成共振意象。<br>艺术化频谱映射，非物理声场模拟。'],galaxy:['星河<br>风暴。','保留你选择的星河。<br>拨弦唤起旋臂与星尘冲击波。']};
+function selectStyle(name){style=name;waves=[];ctx.fillStyle='#080c13';ctx.fillRect(0,0,w,h);document.querySelectorAll('[data-style]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.style===name));$('.intro h1').innerHTML=schemes[name][0];$('.intro p').innerHTML=schemes[name][1];sceneStarted=time;resetField();attack(.5)}
+document.querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{selectStyle(b.dataset.style);if(mode==='demo'){touring=false;sceneStarted=time;showStep=0;$('#tour').textContent='▶ 一键巡演 · 六种效果'}else if(mode==='idle')startShow(false)});
 $('#burst').onclick=()=>attack(2.5);
-const initialStyle=new URLSearchParams(location.search).get('style');if(schemes[initialStyle])selectStyle(initialStyle);
+
 $('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch{$('#status').textContent='当前窗口不支持全屏，可以在浏览器中打开。'}};
 $('#capture').onclick=()=>{const a=document.createElement('a');a.download=`弦生-${Date.now()}.png`;a.href=canvas.toDataURL('image/png');a.click()};
 canvas.addEventListener('pointermove',e=>targetRotation=(e.clientX/w-.5)*.8);
@@ -42,47 +42,9 @@ canvas.addEventListener('pointerdown',()=>attack(1.1));
 let bins=new Uint8Array(1024),samples=new Float32Array(2048);
 function analyze(){let target=0,lo=0,hi=0;if(analyser){analyser.getByteFrequencyData(bins);analyser.getFloatTimeDomainData(samples);target=Math.min(1,Math.sqrt(samples.reduce((s,v)=>s+v*v,0)/samples.length)*5);for(let i=2;i<22;i++)lo+=bins[i]/255/20;for(let i=70;i<260;i++)hi+=bins[i]/255/190;if(target>Math.max(.06,previous*1.32)&&time-lastAttack>.13){attack(Math.min(1,target*1.7));lastAttack=time}previous=previous*.65+target*.35}energy+=(target-energy)*.15;bass+=(lo-bass)*.12;treble+=(hi-treble)*.12;$('#energy').textContent=String(Math.round(energy*99)).padStart(2,'0');$('#meter').style.width=`${energy*100}%`}
 function draw(now){
-const dt=lastTime?Math.min(.05,(now-lastTime)/1000):.016;lastTime=now;time+=dt;analyze();rotation+=(targetRotation-rotation)*.035;
-if(style==='galaxy'){drawGalaxy(dt);raf=requestAnimationFrame(draw);return}
-ctx.globalCompositeOperation='source-over';ctx.fillStyle='rgba(5,8,16,.35)';ctx.fillRect(0,0,w,h);
-const cx=w*(w<750?.5:.56),cy=h*(w<750?.52:.48),scale=Math.min(w*.55,h*.65);
-waves=waves.filter(v=>time-v.born<3.5);const shocks=waves.map(v=>({age:time-v.born,s:v.strength}));let impact=shocks.reduce((sum,v)=>sum+v.s*Math.exp(-v.age*2),0);
-const haze=ctx.createRadialGradient(cx,cy,0,cx,cy,scale);haze.addColorStop(0,style==='rift'?'rgba(110,40,12,.16)':'rgba(35,55,105,.12)');haze.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation='lighter';
-for(const p of points){const u=p.u,v=p.v,seed=p.seed;let x,y,z,hue,sat=75,light=65,pulse=0;
-for(const wave of shocks){const d=u-wave.age*.5;pulse+=Math.exp(-d*d*100)*wave.s*Math.exp(-wave.age*.65)}
-if(style==='galaxy'){
- const r=.04+Math.sqrt(u)*1.12,a=v*Math.PI*2+time*(.06+.09/(r+.2))+r*4.2,arm=Math.floor(v*5)*Math.PI*2/5+r*4.2+time*.08+(seed-.5)*.48;
- const angle=seed>.14?arm:a,rr=r+pulse*.22;
- x=Math.cos(angle)*rr;y=Math.sin(angle)*rr*.48;z=(seed-.5)*(.14+u*.5)+Math.sin(angle)*rr*.35;
- hue=seed>.5?210+u*45:30+u*20;light=62+(1-u)*25;
-}else if(style==='mountains'){
- x=(u-.5)*3.1;z=(v-.5)*2.5;const ridge=Math.pow(Math.max(0,Math.sin(u*12+v*5)+.5*Math.sin(u*24-v*8)),2)*.19;
- y=.38-ridge*(.8+v*.6)-pulse*.27-bass*.23+Math.sin(u*16-v*7+time*.45)*.055;
- hue=seed>.6?175:37;light=45+ridge*75+v*15;
-}else if(style==='dragon'){
- const a=u*Math.PI*3.5-time*.65+p.line*.72,thick=.025+v*.13;
- x=(u-.5)*2.9;y=Math.sin(a)*(.27+pulse*.22)+Math.cos(v*Math.PI*2)*thick;z=Math.cos(a)*.5+Math.sin(v*Math.PI*2)*thick;
- hue=p.line===0?185:26+seed*23;light=53+seed*25;
-}else if(style==='aurora'){
- const a=u*7+time*.2;x=(u-.5)*2.9;z=Math.sin(a)*.35+p.line*.045;
- y=(v-.5)*(1.2+.3*Math.sin(a*1.4)+pulse*.9)+Math.sin(a*1.6)*.17;
- x+=Math.sin(v*4+a)*.1;hue=145+u*110+p.line*9;light=48+seed*20;
-}else{
- const along=(u-.5)*2.5,theta=v*Math.PI*2;
- x=(p.line-1.5)*.26+Math.sin(along*9-time)*(.006+energy*.05)+Math.cos(theta)*pulse*.8;
- y=along;z=Math.sin(theta)*pulse*.8+(seed-.5)*.035;
- if(seed<.32){const travel=((u+time*.07)%1);x=(p.line-1.5)*.26+Math.cos(theta)*travel*(.15+impact*.3);y=(v-.5)*2.6;z=Math.sin(theta)*travel*.5;}
- hue=seed>.6?195:24+seed*27;light=58+seed*24;
-}
-const turn=rotation+Math.sin(time*.07)*.12,xx=x*Math.cos(turn)-z*Math.sin(turn),zz=x*Math.sin(turn)+z*Math.cos(turn),depth=3.2/(3.2+zz);
-const sx=cx+xx*scale*depth,sy=cy+y*scale*depth;let alpha=Math.min(.85,(.13+seed*.48+pulse*.22+energy*.2)),size=(.45+seed*.8+pulse*.7+energy*.5)*depth;
-ctx.fillStyle=`hsla(${hue},${sat}%,${Math.min(92,light)}%,${alpha})`;ctx.fillRect(sx,sy,size,size);
-if(seed>.993){ctx.fillStyle=`hsla(${hue},85%,75%,.09)`;ctx.beginPath();ctx.arc(sx,sy,size*5,0,Math.PI*2);ctx.fill()}
-}
-// Expanding shock fronts distinguish individual plucks from ambient movement.
-if(style==='galaxy'||style==='rift')for(const wave of shocks){let r=wave.age*scale*.65;if(r<3)continue;ctx.strokeStyle=`rgba(210,180,130,${Math.max(0,.2-wave.age*.07)*wave.s})`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(cx,cy,r,style==='galaxy'?r*.48:r*.75,rotation,0,Math.PI*2);ctx.stroke()}
-ctx.globalCompositeOperation='source-over';raf=requestAnimationFrame(draw)}
-
+const elapsed=lastTime?Math.max(0,(now-lastTime)/1000):.016,dt=Math.min(.05,elapsed);lastTime=now;time+=elapsed;analyze();rotation+=(targetRotation-rotation)*(1-Math.exp(-dt*3));
+if(style==='galaxy')drawGalaxy(dt);else drawField(dt);
+raf=requestAnimationFrame(draw)}
 // Stable particles and cached glow sprites keep the layered star field coherent.
 const starPalettes=['190,218,255','112,154,255','177,133,244','255,206,147','239,246,255'];
 const glowSprites=starPalettes.map(rgb=>{const sprite=document.createElement('canvas');sprite.width=sprite.height=64;const c=sprite.getContext('2d'),g=c.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,`rgba(${rgb},.9)`);g.addColorStop(.12,`rgba(${rgb},.55)`);g.addColorStop(.4,`rgba(${rgb},.13)`);g.addColorStop(1,`rgba(${rgb},0)`);c.fillStyle=g;c.fillRect(0,0,64,64);return sprite});
@@ -126,4 +88,60 @@ function drawGalaxy(dt){
  ctx.globalCompositeOperation='source-over';
  const vignette=ctx.createRadialGradient(cx,cy,scale*.4,cx,cy,Math.max(w,h)*.8);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,2,8,.78)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
 }
+
+const fieldPoints=Array.from({length:8500},(_,i)=>({u:Math.random(),v:Math.random(),q:Math.random(),seed:Math.random(),lane:i%4,x:0,y:0,z:0,px:null,py:null,opacity:0}));
+let fieldLevel=0,fieldBrightness=0,fieldHue=190;
+// Precompute nodal silhouettes; particles ease toward the active frequency pattern.
+const sandPatterns=[[2,3],[3,5],[4,7]].map(([m,n])=>{const result=[];while(result.length<8500){let x=Math.random()*2-1,y=Math.random()*2-1;const val=Math.cos(m*Math.PI*x)*Math.cos(n*Math.PI*y)-Math.cos(n*Math.PI*x)*Math.cos(m*Math.PI*y);if(Math.abs(val)<.075)result.push([x,y])}return result});
+function resetField(){fieldPoints.forEach(p=>{p.px=p.py=null;p.opacity=0});fieldLevel=energy;}
+function drawField(dt){
+ const mobile=w<750,scale=Math.min(w*(mobile?.48:.36),h*(mobile?.28:.36)),cx=w*(mobile?.5:.55),cy=h*(mobile?.48:.48);
+ fieldLevel+=(energy-fieldLevel)*(1-Math.exp(-dt*5));fieldBrightness+=(treble-fieldBrightness)*(1-Math.exp(-dt*2));
+ const desiredHue=style==='sand'?36:style==='ribbon'?185+fieldBrightness*90:190+fieldBrightness*70;fieldHue+=(desiredHue-fieldHue)*(1-Math.exp(-dt*1.5));
+ ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.fillStyle='rgba(5,9,17,.48)';ctx.fillRect(0,0,w,h);
+ const events=waves.filter(wave=>time-wave.born<3);waves=events;const impulse=Math.min(1.8,events.reduce((s,event)=>s+event.strength*Math.exp(-(time-event.born)*4),0))*tension;
+ const blend=1-Math.exp(-dt*5),breath=1+fieldLevel*.32*tension;
+ ctx.globalCompositeOperation='lighter';
+ for(let i=0;i<fieldPoints.length;i++){
+  if(mobile&&i%3===0)continue;
+  const p=fieldPoints[i],u=p.u,v=p.v,seed=p.seed;let x,y,z,local=0;
+  if(style==='cloud'){
+   const a=u*Math.PI*2,b=Math.acos(v*2-1),radius=Math.pow(p.q,.45)*.83;
+   const ripple=events.reduce((s,event)=>{const d=radius-(time-event.born)*.7;return s+Math.exp(-d*d*100)*event.strength*.09},0);
+   const r=radius*breath+ripple,flow=Math.sin(a*3+b*2+time*.18)*.06;
+   x=Math.cos(a+time*.025)*Math.sin(b)*r*(1.18+flow);y=Math.cos(b)*r*.85;z=Math.sin(a+time*.025)*Math.sin(b)*r;
+   x+=Math.sin(time*.24+v*7)*.025;local=ripple*3;
+  }else if(style==='ribbon'){
+   let pulse=0;for(const event of events){let d=u-(time-event.born)*.65;pulse+=Math.exp(-d*d*130)*event.strength}
+   const phase=u*6.8+p.lane*.65+Math.sin(time*.2)*.3,thickness=(v-.5)*(.035+fieldLevel*.04),twist=time*.12;
+   x=(u-.5)*2.7;y=Math.sin(phase+twist)*(.19+p.lane*.055)+thickness+Math.sin(v*6)*pulse*.07;
+   z=Math.cos(phase)*.3+(p.lane-1.5)*.075+(p.q-.5)*.035;y+=Math.sin(u*13-time*.4)*fieldLevel*.09;local=pulse*.3;
+  }else if(style==='water'){
+   x=(u-.5)*2.6;z=(v-.5)*2.2;let height=0;
+   for(let j=0;j<events.length;j++){const event=events[j],age=time-event.born,ox=Math.sin(event.born*1.7)*.4,oz=Math.cos(event.born*1.1)*.3,dist=Math.hypot(x-ox,z-oz),front=dist-age*.9;
+   height+=Math.cos(front*15)*Math.exp(-front*front*7)*Math.exp(-age*.85)*event.strength*.13*tension;}
+   y=.13+z*.28+height;local=Math.abs(height)*3;
+  }else if(style==='ring'){
+   const angle=u*Math.PI*2,bin=Math.min(500,Math.floor(u*260)+2),frequency=analyser?bins[bin]/255:0;
+   const radius=.7+(v-.5)*.09+frequency*.32*tension+impulse*.035;
+   x=Math.cos(angle)*radius;y=Math.sin(angle)*radius;z=(p.q-.5)*.1+Math.sin(angle*3+time*.1)*.025;local=frequency*.45;
+  }else{
+   const index=Math.min(2,Math.round(fieldBrightness*4+bass*.45)),a=sandPatterns[index][i];
+   x=a[0]*.95;y=a[1]*.8;
+   const scatter=impulse*.035;x+=Math.sin(seed*90+time)*scatter;y+=Math.cos(seed*70+time)*scatter;z=(p.q-.5)*.09;local=impulse*.1;
+  }
+  if(p.px===null){p.x=x;p.y=y;p.z=z}p.x+=(x-p.x)*blend;p.y+=(y-p.y)*blend;p.z+=(z-p.z)*blend;
+  const opacityTarget=mode==='idle'?.22:(.25+fieldLevel*.55+local*.12),visible=p.q<.48+fieldLevel*.5||mode==='idle';p.opacity+=((visible?opacityTarget:.035)-p.opacity)*(1-Math.exp(-dt*4));
+  const turn=rotation*.55,xx=p.x*Math.cos(turn)-p.z*Math.sin(turn),zz=p.x*Math.sin(turn)+p.z*Math.cos(turn),depth=3/(3+zz);
+  const sx=cx+xx*scale*depth,sy=cy+p.y*scale*depth,size=(.45+seed*.65+local*.3)*depth;
+  const hue=fieldHue+(seed-.5)*18+(p.lane===0?15:0),color=style==='sand'?'241,204,146':p.lane===0?'210,223,244':'139,196,218';
+  if(p.px!==null&&local>.2){const dx=sx-p.px,dy=sy-p.py;if(Math.hypot(dx,dy)<15){ctx.strokeStyle=`rgba(${color},${p.opacity*.16})`;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(p.px,p.py);ctx.lineTo(sx,sy);ctx.stroke()}}
+  ctx.fillStyle=`hsla(${hue},${style==='sand'?52:40}%,${68+seed*15}%,${p.opacity})`;ctx.beginPath();ctx.arc(sx,sy,size*.7,0,Math.PI*2);ctx.fill();
+  if(seed>.965){const gl=(4+seed*2+local*2)*depth;ctx.globalAlpha=p.opacity*.27;ctx.drawImage(glowSprites[style==='sand'?3:0],sx-gl,sy-gl,gl*2,gl*2);ctx.globalAlpha=1}
+  p.px=sx;p.py=sy;
+ }
+ if(style==='ring')for(const event of events){const age=time-event.born,r=(.76+age*.23)*scale;ctx.strokeStyle=`rgba(170,210,235,${Math.max(0,.15-age*.08)*event.strength})`;ctx.lineWidth=.7;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke()}
+ ctx.globalCompositeOperation='source-over';
+}
+const initialStyle=new URLSearchParams(location.search).get('style');if(schemes[initialStyle])selectStyle(initialStyle);
 ctx.fillStyle='#080c13';ctx.fillRect(0,0,w,h);raf=requestAnimationFrame(draw);addEventListener('pagehide',()=>{stop();cancelAnimationFrame(raf)});
