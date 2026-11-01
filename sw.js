@@ -1,4 +1,4 @@
-const CACHE='audio-score-app-3908cfa79c28';
+const CACHE='audio-score-app-65073ccb1c0e';
 const FILES=['./','./index.html','./page.template.html','./style.css','./simple.css','./demo-audio.js','./transcribe.js','./app-shell.js','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
 self.addEventListener('message',event=>{if(event.data?.type==='ACTIVATE_UPDATE')self.skipWaiting();});
