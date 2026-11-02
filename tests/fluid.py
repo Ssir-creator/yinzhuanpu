@@ -9,23 +9,23 @@ with sync_playwright() as p:
     page=browser.new_page(viewport={'width':1280,'height':900},accept_downloads=True)
     errors=[]
     page.on('pageerror',lambda error:errors.append(str(error)))
-    page.goto(URL)
+    page.goto(URL+("&" if "?" in URL else "?")+"style=S")
     assert page.evaluate('ready')
     assert page.evaluate('presets[0].id')=='S'
     assert page.locator('#legacy').is_visible()
     assert page.locator('#fluid').is_hidden()
-    assert page.locator('[data-preset]').count()==9
+    assert page.locator('[data-preset]').count()==10
     page.locator('#tour').click()
     page.wait_for_function('energy > .01')
-    for index in range(9):
+    for index in range(10):
         assert page.evaluate('selected')==index
         assert page.locator('#legacy').is_visible() == (index==0)
         page.screenshot(path=f'/tmp/fluid-study-{index}.png')
         assert page.evaluate('gl.getError()')==0
         page.evaluate('phaseTime=16.1')
-        if index<8:page.wait_for_function(f'selected==={index+1}')
+        if index<9:page.wait_for_function(f'selected==={index+1}')
     page.wait_for_function("mode==='idle'")
-    assert '九幕结束' in page.locator('#phase').inner_text()
+    assert '十幕结束' in page.locator('#phase').inner_text()
     page.locator('[data-preset="6"]').click()
     page.wait_for_function("mode==='demo'")
     page.locator('#pause').click()
@@ -51,8 +51,8 @@ with sync_playwright() as p:
     page.set_viewport_size({'width':390,'height':844})
     page.wait_for_timeout(100)
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
-    assert all(page.locator(f'[data-preset="{i}"]').is_visible() for i in range(9))
+    assert all(page.locator(f'[data-preset="{i}"]').is_visible() for i in range(10))
     page.screenshot(path='/tmp/fluid-study-mobile.png')
     assert not errors,errors
-    print('PASS: nine presets including the preserved galaxy, tour completion, pause/resume, immersion, PNG export, microphone, file audio, mobile layout.')
+    print('PASS: ten presets including the preserved galaxy, tour completion, pause/resume, immersion, PNG export, microphone, file audio, mobile layout.')
     browser.close()
