@@ -38,6 +38,7 @@ def publish():
         for name in [
             'style.css', 'simple.css', 'demo-audio.js', 'transcribe.js', 'app-shell.js',
             'particles.html', 'particles.css', 'particles.js',
+            'fluid.html', 'fluid.css', 'fluid.js',
             'manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'icons/icon-512.png',
         ]:
             files.append((name, (ROOT / name).read_bytes()))
