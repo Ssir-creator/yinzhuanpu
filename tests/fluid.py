@@ -22,6 +22,9 @@ with sync_playwright() as p:
         assert page.locator('#legacy').is_visible() == (index==0)
         page.screenshot(path=f'/tmp/fluid-study-{index}.png')
         assert page.evaluate('gl.getError()')==0
+        if index==9:
+            assert page.evaluate('targetWidth===canvas.width && targetHeight===canvas.height')
+            assert page.locator('#title').inner_text()=='层叠粒子风暴'
         page.evaluate('phaseTime=16.1')
         if index<9:page.wait_for_function(f'selected==={index+1}')
     page.wait_for_function("mode==='idle'")
