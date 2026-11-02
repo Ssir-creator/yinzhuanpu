@@ -10,6 +10,7 @@ with sync_playwright() as p:
     errors=[]
     page.on('pageerror',lambda error:errors.append(str(error)))
     page.goto(URL+("&" if "?" in URL else "?")+"style=S")
+    page.locator('#alternatives').evaluate('(el)=>el.open=true')
     assert page.evaluate('ready')
     assert page.evaluate('presets[0].id')=='S'
     assert page.locator('#legacy').is_visible()
