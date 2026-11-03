@@ -36,8 +36,9 @@ with sync_playwright() as p:
     page.wait_for_function('energy>.01 && smokeRenderer.events.length>0')
     page.wait_for_timeout(1400)
     page.screenshot(path='/tmp/smoke-final-B.png')
+    page.locator('#alternatives').evaluate('(el)=>el.open=true')
     for index,name in [(7,'BC'),(8,'BF')]:
-        page.locator(f'[data-quick="{name}"]').click()
+        page.locator(f'[data-preset="{index}"]').click()
         page.wait_for_timeout(150)
         assert page.evaluate('mode')=='demo'
         assert page.locator('#flow').is_visible()
@@ -55,7 +56,7 @@ with sync_playwright() as p:
     page.wait_for_function("mode==='file' && energy>.01")
     page.locator('#stop-audio').click()
     assert page.evaluate('mode')=='idle'
-    page.locator('[data-quick="S"]').click()
+    page.locator('#original-star').click()
     assert page.locator('#legacy').is_visible()
     page.locator('[data-quick="B"]').click()
     page.set_viewport_size({'width':390,'height':844})
